@@ -27,10 +27,10 @@ const ArComponent: React.FC = () => {
   }, []);
 
   const handleModelClick = () => {
-    setCount((prevCount) => prevCount + 1); // countを1増やす
+    setCount((prevCount) => prevCount + 1); 
   };
   const getImageSrc = () => {
-    const imageNumber = (count % 3) + 1; // 1, 2, 3のいずれか
+    const imageNumber = (count % 3) + 1;
     return `imgs/cat${imageNumber}.jpg`;
   };
   return (
@@ -69,17 +69,17 @@ const ArComponent: React.FC = () => {
           src="#AR3MODEL"
           class="clickable"
           animation="property: position; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate"
-          onClick={handleModelClick} // onClickイベントハンドラを追加
+          onClick={handleModelClick} 
         ></a-gltf-model>
         <a-image
-          src={getImageSrc()} // 画像のソースを動的に設定
+          src={getImageSrc()} 
           position="0 0.5 0.1"
           height="0.3"
           width="0.3"
         ></a-image>
         <a-text
-          value={`# of Clicks: ${count}`} // countの値を表示
-          position="0 0.2 0.1" // オブジェクトの上にテキストを配置
+          value={`# of Clicks: ${count}`} 
+          position="0 0.2 0.1" 
           scale="0.5 0.5 0.5"
           color="blue"
         ></a-text>
