@@ -29,11 +29,15 @@ const ArComponent: React.FC = () => {
   const handleModelClick = () => {
     setCount((prevCount) => prevCount + 1); // countを1増やす
   };
-
+  const getImageSrc = () => {
+    const imageNumber = (count % 3) + 1; // 1, 2, 3のいずれか
+    return `imgs/cat${imageNumber}.jpg`;
+  };
   return (
     <a-scene
       ref={sceneRef}
-      mindar-image="imageTargetSrc: target/cat.mind; autoStart: false; uiLoading: no; uiError: no; uiScanning: no;"
+      // mindar-image="imageTargetSrc: target/cat.mind; autoStart: false; uiLoading: no; uiError: no; uiScanning: no;"
+      mindar-image="imageTargetSrc: target/pep-two.mind; autoStart: false; uiLoading: no; uiError: no; uiScanning: no;"
       // mindar-image="imageTargetSrc: target/pepOne.mind; autoStart: false; uiLoading: no; uiError: no; uiScanning: no;"
       // mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.0/examples/image-tracking/assets/card-example/card.mind; autoStart: false; uiLoading: no; uiError: no; uiScanning: no;"
       color-space="sRGB"
@@ -67,8 +71,14 @@ const ArComponent: React.FC = () => {
           animation="property: position; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate"
           onClick={handleModelClick} // onClickイベントハンドラを追加
         ></a-gltf-model>
+        <a-image
+          src={getImageSrc()} // 画像のソースを動的に設定
+          position="0 0.5 0.1"
+          height="0.3"
+          width="0.3"
+        ></a-image>
         <a-text
-          value={`Count: ${count}`} // countの値を表示
+          value={`# of Clicks: ${count}`} // countの値を表示
           position="0 0.2 0.1" // オブジェクトの上にテキストを配置
           scale="0.5 0.5 0.5"
           color="blue"
