@@ -13,6 +13,7 @@ declare module "react" {
       "a-camera": any;
       "a-gltf-model": any;
       "a-plane": any;
+      "a-text": any;
     }
   }
 }

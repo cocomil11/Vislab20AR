@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "aframe";
 import "mind-ar/dist/mindar-image-aframe.prod.js";
 import { Scene } from "aframe";
 
 const ArComponent: React.FC = () => {
   const sceneRef = useRef<Scene | null>(null);
+  const [count, setCount] = useState<number>(0);
 
   useEffect(() => {
     const sceneEl = sceneRef.current; // TypeScript automatically understands sceneEl is of type Scene | null
@@ -17,7 +18,6 @@ const ArComponent: React.FC = () => {
         }
       };
       sceneEl.addEventListener("renderstart", startAr);
-
       return () => {
         if (arSystem) {
           arSystem.stop(); // Proper cleanup on unmount
@@ -25,6 +25,10 @@ const ArComponent: React.FC = () => {
       };
     }
   }, []);
+
+  const handleModelClick = () => {
+    setCount((prevCount) => prevCount + 1); // countを1増やす
+  };
 
   return (
     <a-scene
@@ -39,31 +43,36 @@ const ArComponent: React.FC = () => {
       device-orientation-permission-ui="enabled: false"
     >
       <a-assets>
-        <img
-          id="card"
-          src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.0/examples/image-tracking/assets/card-example/card.png"
-        />
         <a-asset-item
-          id="avatarModel"
-          src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.0/examples/image-tracking/assets/card-example/softmind/scene.gltf"
+          id="AR3MODEL"
+          // src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.0/examples/image-tracking/assets/card-example/softmind/scene.gltf"
+          src="models/ar3.gltf"
         ></a-asset-item>
       </a-assets>
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      {/* <a-camera position="0 0 0" look-controls="enabled: false"></a-camera> */}
+      <a-camera
+        position="0 0 0"
+        look-controls="enabled: false"
+        cursor="fuse: false; rayOrigin: mouse;"
+        raycaster="far: ${customFields.libVersion}; objects: .clickable"
+      ></a-camera>
       <a-entity mindar-image-target="targetIndex: 0">
-        <a-plane
-          src="#card"
-          position="0 0 0"
-          height="0.552"
-          width="1"
-          rotation="0 0 0"
-        ></a-plane>
         <a-gltf-model
-          rotation="0 0 0"
+          id="AR3"
+          rotation="0 180 180"
           position="0 0 0.1"
-          scale="0.005 0.005 0.005"
-          src="#avatarModel"
+          scale="0.01 0.01 0.01"
+          src="#AR3MODEL"
+          class="clickable"
           animation="property: position; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate"
+          onClick={handleModelClick} // onClickイベントハンドラを追加
         ></a-gltf-model>
+        <a-text
+          value={`Count: ${count}`} // countの値を表示
+          position="0 0.2 0.1" // オブジェクトの上にテキストを配置
+          scale="0.5 0.5 0.5"
+          color="blue"
+        ></a-text>
       </a-entity>
     </a-scene>
   );

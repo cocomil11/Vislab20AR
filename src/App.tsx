@@ -7,12 +7,7 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <h1>
-        Example React component with{" "}
-        <a href="https://github.com/hiukim/mind-ar-js" target="_blank">
-          MindAR
-        </a>
-      </h1>
+      <h1>PEP : READY, GET SET, GO!</h1>
 
       <div className="control-buttons">
         {started === null && (
@@ -21,7 +16,7 @@ const App: React.FC = () => {
               setStarted("aframe");
             }}
           >
-            Start AFRAME version
+            Start Tracking
           </button>
         )}
         {started !== null && (
