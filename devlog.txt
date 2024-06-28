@@ -1,0 +1,1 @@
+- Fidial marker （単純なもの）では、なぜか mind-ar で認識できない。
