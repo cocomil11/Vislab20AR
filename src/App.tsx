@@ -3,11 +3,12 @@ import "./assets/css/App.css"; // import MindARViewer from "./mindar-viewer";
 import ArComponent from "./ArComponent";
 
 const App: React.FC = () => {
+  // const [started, setStarted] = useState<string | null>(null);
   const [started, setStarted] = useState<string | null>(null);
 
   return (
     <div className="App">
-      <h1>PEP : READY, GET SET, GO!</h1>
+      <h1>VISLAB 20th Anniversary!</h1>
 
       <div className="control-buttons">
         {started === null && (
@@ -33,7 +34,6 @@ const App: React.FC = () => {
       {started === "aframe" && (
         <div className="container">
           <ArComponent />
-          <video></video>
         </div>
       )}
     </div>
