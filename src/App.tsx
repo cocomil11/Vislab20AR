@@ -27,7 +27,7 @@ const Slider: React.FC<{ currentYear: number }> = ({ currentYear }) => {
 
 const App: React.FC = () => {
   const [started, setStarted] = useState<string | null>(null);
-  var year = 2004;
+  var year = 2023;
 
   return (
     <div className="App">

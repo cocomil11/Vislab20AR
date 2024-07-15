@@ -122,9 +122,10 @@ export default function LineChart(props) {
         ],
         legend: {
             orient: 'vertical',
-            left: 98,
-            top: 50,
-            color: "#333"
+            left: "12%", //98,
+            top: "16%", //50,
+            color: "#333",
+            fontSize: 7
         }
     };
 
@@ -133,7 +134,7 @@ export default function LineChart(props) {
             option={option}
             // notMerge
             // lazyUpdate
-            style={{ height: '100%', width: "100%", marginLeft: '3px'}} //, marginLeft: '-5px', paddingTop: '15px'}}
+            style={{ height: '100%', width: "100%"}} //, marginLeft: '3px'}} //, marginLeft: '-5px', paddingTop: '15px'}}
         />
     );
 }
