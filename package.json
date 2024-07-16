@@ -45,6 +45,8 @@
   },
   "devDependencies": {
     "@types/aframe": "^1.2.6",
-    "echarts": "^5.5.1"
+    "@types/react-router-dom": "^5.3.3",
+    "echarts": "^5.5.1",
+    "react-router-dom": "^6.24.1"
   }
 }
