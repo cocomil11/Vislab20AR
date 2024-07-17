@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "aframe";
 import "mind-ar/dist/mindar-image-aframe.prod.js";
 import { Scene } from "aframe";
-import * as echarts from "echarts";
+// import * as echarts from "echarts";
 
 const ArComponent: React.FC = () => {
   const sceneRef = useRef<Scene | null>(null);
@@ -41,25 +41,25 @@ const ArComponent: React.FC = () => {
       .catch((error) => console.error("Error fetching the image list:", error));
   }, []);
 
-  useEffect(() => {
-    const chart = echarts.init(chartRef.current);
-    const option = {
-      xAxis: {
-        type: "category",
-        data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-      },
-      yAxis: {
-        type: "value",
-      },
-      series: [
-        {
-          data: [150, 230, 224, 218, 135, 147, 260],
-          type: "line",
-        },
-      ],
-    };
-    chart.setOption(option);
-  }, []);
+  // useEffect(() => {
+  //   const chart = echarts.init(chartRef.current);
+  //   const option = {
+  //     xAxis: {
+  //       type: "category",
+  //       data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  //     },
+  //     yAxis: {
+  //       type: "value",
+  //     },
+  //     series: [
+  //       {
+  //         data: [150, 230, 224, 218, 135, 147, 260],
+  //         type: "line",
+  //       },
+  //     ],
+  //   };
+  //   chart.setOption(option);
+  // }, []);
 
   const handleImageYearClick = () => {
     setYear((prevYear) => (prevYear < 2024 ? prevYear + 1 : 2014));
@@ -74,10 +74,11 @@ const ArComponent: React.FC = () => {
     // const imageNumber = (count % 3) + 1;
     if (imageLists[year]) {
       const imgPath = imageLists[year][imgIndex];
-      console.log(imgPath);
+      console.log(`imgs/${imgPath}`);
+      // return `imgs/2016/dongyu_wedding2.jpg`;
       return `imgs/${imgPath}`;
     }
-    return "";
+    return `imgs/2016/dongyu_wedding2.jpg`;
   };
 
   return (
@@ -156,13 +157,13 @@ const ArComponent: React.FC = () => {
             color="black"
           ></a-text>
         </a-entity>
-        <a-entity position="1 -1 0">
-          {/* <a-entity
+        {/* <a-entity position="1 -1 0"> */}
+        {/* <a-entity
             ref={chartRef}
             style={{ width: "100%", height: "100%" }}
           ></a-entity> */}
-          <div ref={chartRef} style={{ width: "100%", height: "100%" }}></div>
-        </a-entity>
+        {/* <div ref={chartRef} style={{ width: "100%", height: "100%" }}></div> */}
+        {/* </a-entity> */}
       </a-entity>
     </a-scene>
   );

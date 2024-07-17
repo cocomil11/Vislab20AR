@@ -34,6 +34,7 @@ const App: React.FC = () => {
       {started === "aframe" && (
         <div className="container">
           <ArComponent />
+          <video></video>
         </div>
       )}
     </div>
