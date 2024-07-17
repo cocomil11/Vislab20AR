@@ -1,76 +1,61 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 const Scan: React.FC = () => {
   const [loaded, setLoaded] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
+  const [isDetected, setIsDetected] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const targetImgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     const loadOpenCv = () => {
-      const script = document.createElement('script');
       // @ts-ignore
-      script.src = 'https://docs.opencv.org/4.5.2/opencv.js';
+      if (!window.cv) {
+        const script = document.createElement('script');
       // @ts-ignore
-      script.async = true;
-      script.onload = () => {
-        console.log('OpenCV script loaded');
-        if ((window as any).cv) {
-          (window as any).cv['onRuntimeInitialized'] = () => {
-            console.log('OpenCV initialized');
+        script.src = 'https://docs.opencv.org/4.5.2/opencv.js';
+      // @ts-ignore
+        script.async = true;
+        script.onload = () => {
+      // @ts-ignore
+          if (window.cv && !window.cv['onRuntimeInitialized']) {
+      // @ts-ignore
+            window.cv['onRuntimeInitialized'] = () => {
+              setLoaded(true);
+            };
+      // @ts-ignore
+          } else if (window.cv && window.cv['onRuntimeInitialized']) {
             setLoaded(true);
-          };
-        }
-      };
-      document.body.appendChild(script);
+          }
+        };
+        document.body.appendChild(script);
+      // @ts-ignore
+      } else if (window.cv && window.cv['onRuntimeInitialized']) {
+        setLoaded(true);
+      } else {
+      // @ts-ignore
+        window.cv['onRuntimeInitialized'] = () => {
+          setLoaded(true);
+        };
+      }
     };
 
-    if (!(window as any).cv) {
-      loadOpenCv();
-    } else {
-      setLoaded(true);
-    }
+    loadOpenCv();
   }, []);
 
-  useEffect(() => {
-    if (loaded) {
-      startVideo();
-    }
-  }, [loaded]);
-
-  const startVideo = () => {
-    navigator.mediaDevices.getUserMedia({
-      audio: false,
-      video: {
-        width: { min: 1024, ideal: 1280, max: 1920 },
-        height: { min: 576, ideal: 720, max: 1080 },
-      },
-    })
-      .then(stream => {
-        const videoElement = videoRef.current as HTMLVideoElement;
-        if (videoElement) {
-          console.log('Setting video stream');
-          videoElement.srcObject = stream;
-          videoElement.play().then(() => {
-            console.log('Video playing');
-          }).catch(err => {
-            console.error('Error playing video: ', err);
-          });
-        }
-      })
-      .catch(err => {
-        console.error("Error accessing webcam: ", err);
-      });
-  };
-
-  const processVideo = () => {
-    if (!loaded || !videoRef.current || !canvasRef.current || !targetImgRef.current) return;
-
-    const cv = (window as any).cv;
+  const processVideo = useCallback(() => {
+      // @ts-ignore
+    const cv = window.cv;
     const videoElement = videoRef.current as HTMLVideoElement;
+    const width = videoElement.videoWidth;
+    const height = videoElement.videoHeight;
+
+    if (!loaded || !width || !height) {
+      console.error("Video element has zero width or height or OpenCV not loaded.");
+      return;
+    }
+
     const cap = new cv.VideoCapture(videoElement);
-    const src = new cv.Mat(videoElement.videoHeight, videoElement.videoWidth, cv.CV_8UC4);
+    const src = new cv.Mat(height, width, cv.CV_8UC4);
     const gray = new cv.Mat();
 
     const processFrame = () => {
@@ -107,13 +92,13 @@ const Scan: React.FC = () => {
 
         const matchThreshold = 10;
         if (goodMatches.length > matchThreshold) {
-          setResult('Image is similar');
+          setIsDetected(true);
         } else {
-          setResult('Image is not similar');
+          setIsDetected(false);
         }
 
         targetSrc.delete();
-        matches.delete(); // Move this line here
+        matches.delete();
       }
 
       src.delete(); gray.delete();
@@ -124,27 +109,57 @@ const Scan: React.FC = () => {
     };
 
     requestAnimationFrame(processFrame);
-  };
+  }, [loaded]);
+
+  const startVideo = useCallback(() => {
+    navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: true,
+    })
+      .then(stream => {
+        const videoElement = videoRef.current as HTMLVideoElement;
+        if (videoElement) {
+          videoElement.srcObject = stream;
+          videoElement.onloadedmetadata = () => {
+            videoElement.play().then(() => {
+              console.log('Video playing');
+              processVideo();
+            }).catch(err => {
+              console.error('Error playing video: ', err);
+            });
+          };
+        }
+      })
+      .catch(err => {
+        console.error("Error accessing webcam: ", err);
+      });
+  }, [processVideo]);
 
   useEffect(() => {
-    if (videoRef.current && canvasRef.current && targetImgRef.current) {
-      targetImgRef.current.onload = () => {
+    if (loaded) {
+      startVideo();
+    }
+  }, [loaded, startVideo]);
+
+  useEffect(() => {
+    if (videoRef.current && targetImgRef.current) {
+      const imageElement = targetImgRef.current;
+      imageElement.onload = () => {
         processVideo();
       };
       // In case the image is already loaded, call processVideo immediately
-      if (targetImgRef.current.complete) {
+      if (imageElement.complete) {
         processVideo();
       }
     }
-  }, [videoRef, canvasRef, targetImgRef]);
+  }, [videoRef, targetImgRef, processVideo]);
 
   return (
     <div>
       <h1>Scan Page</h1>
-      <video ref={videoRef} style={{ width: '640px', height: '480px' }}></video>
-      <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
-      <img ref={targetImgRef} id="targetImage" src="http://localhost:3000/imgs/cat1.jpg" style={{ display: 'none' }} alt="target" />
-      <p>{result}</p>
+      <video ref={videoRef} style={{ width: '100%', height: 'auto' }}></video>
+      <img ref={targetImgRef} id="targetImage" src="http://localhost:3000/imgs/target.jpg" style={{ display: 'none' }} alt="target" />
+      <p>{isDetected ? 'Image is detected!' : 'Image is not detected.'}</p>
     </div>
   );
 };
