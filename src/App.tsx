@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import "./assets/css/App.css"; // import MindARViewer from "./mindar-viewer";
-import logo from './vislab_logo.png';
-import "./assets/css/ui.css"
-import LineChart from './LineChart.js';
+import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Pagination from '@mui/material/Pagination';
-import Stack from '@mui/material/Stack';
 
-var mSVG = <svg className="icon" viewBox="0 0 1194 1024"><path d="M481.457 880.601l-89.86-81.301 263.168-290.983-263.168-290.983 89.86-81.301 335.913 372.283z" p-id="5100"></path></svg>
+import LineChart from './LineChart.js';
+
+import logo from './vislab_logo.png';
+import "./assets/css/ui.css"
+import "./assets/css/App.css"; // import MindARViewer from "./mindar-viewer";
+
+const mSVG = <svg className="icon" viewBox="0 0 1194 1024"><path d="M481.457 880.601l-89.86-81.301 263.168-290.983-263.168-290.983 89.86-81.301 335.913 372.283z" p-id="5100"></path></svg>
 
 const Slider: React.FC<{ currentYear: number }> = ({ currentYear }) => {
   var progress = (currentYear - 2004)/20 * 100;
@@ -35,9 +37,9 @@ interface ImageList {
 }
 
 const App: React.FC = () => {
+  // TODO: change the URL in deployment
   const imageURLBase: string = "http://localhost:3000/imgs"
 
-  const [started, setStarted] = useState<string | null>(null);
   const [year, setYear] = useState<number>(2014)
   const [imagePage, setimagePage] = useState<number>(1);
   const [imageList, setImageList] = useState<ImageList | null>(null)
@@ -69,6 +71,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // TODO: change the URL in deployment
         const response = await fetch('http://localhost:3000/data/images_by_year.json');
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -93,12 +96,12 @@ const App: React.FC = () => {
 
   const handleChangePagenation = (event: React.ChangeEvent<unknown>, page: number) => {
     setimagePage(page);
+
     const imageURLNew: string = getImageURL(imageList, year, page)
     setImageURL(imageURLNew)
-    console.log(imageURLNew)
   };
 
-  const onClickLeft = () => {
+  const goToPrevYear = () => {
     // update year
     const newYear: number = year > 2014 ? year - 1 : 2024
     setYear(newYear)
@@ -114,7 +117,7 @@ const App: React.FC = () => {
     setImageCount(imageCountNew)
   }
 
-  const onClickRight = () => {
+  const goToNextYear = () => {
     // update year
     const newYear: number = year < 2024 ? year + 1 : 2014
     setYear(newYear)
@@ -138,17 +141,17 @@ const App: React.FC = () => {
       </div>
       <div className="canvas">
           <div className="photo-container">
-            <Button variant="outlined" onClick={onClickLeft}>
+            <Button variant="outlined" onClick={goToPrevYear}>
               <span id="left-arrow">{mSVG}</span>
             </Button>
             <div className="photo-canvas">
-              <img src={imageURL} className="photo"  alt="image" style={{ width: "100%", height: "auto" }}/>
+              <img src={imageURL} className="photo"  alt="" style={{ width: "100%", height: "auto" }}/>
               <div className="photo-caption">VisLab {year.toString()}</div>
               <Stack spacing={2} sx={{display: "flex", alignItems: "center"}}>
                 <Pagination count={imageCount} page={imagePage} onChange={handleChangePagenation} />
               </Stack>
             </div>
-            <Button variant="outlined" onClick={onClickRight}>
+            <Button variant="outlined" onClick={goToNextYear}>
               <span id="right-arrow">{mSVG}</span>
             </Button>
           </div>
