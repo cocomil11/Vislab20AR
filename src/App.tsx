@@ -37,10 +37,25 @@ interface ImageList {
 }
 
 const App: React.FC = () => {
+  const imageURLBase: string = "http://localhost:3000/imgs"
+
   const [started, setStarted] = useState<string | null>(null);
   const [year, setYear] = useState<number>(2014)
   const [imagePage, setimagePage] = useState<number>(1);
   const [imageList, setImageList] = useState<ImageList | null>(null)
+  const [imageURL, setImageURL] = useState<string>("")
+
+  const getImageURL = (imageList: ImageList | null, year: number, imagePage: number) => {
+    if (imageList === null) {
+      const imageURLForNoImage: string = `${imageURLBase}/no_image.png`
+      return imageURLForNoImage
+    } else {
+      const imageListKey: keyof ImageList = year.toString() as keyof ImageList
+      const imageURLEnd:string = imageList[imageListKey][imagePage-1]
+      const imageURLNew:string = `${imageURLBase}/${imageURLEnd}`
+      return imageURLNew
+    }
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,7 +66,10 @@ const App: React.FC = () => {
         }
         const imageListData: ImageList = await response.json();
         setImageList(imageListData)
-        console.log(imageListData)
+
+        // set URL of the default image
+        const imageURLNew: string = getImageURL(imageListData, year, imagePage)
+        setImageURL(imageURLNew)
       } catch (error) {
         console.log("=== Error on fetching image list ===")
       } 
@@ -60,20 +78,29 @@ const App: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    setimagePage(value);
+  const handleChangePagenation = (event: React.ChangeEvent<unknown>, page: number) => {
+    setimagePage(page);
+    const imageURLNew: string = getImageURL(imageList, year, page-1)
+    setImageURL(imageURLNew)
+    console.log(imageURLNew)
   };
 
   const onClickLeft = () => {
     const newYear: number = year > 2014 ? year - 1 : 2024
     setYear(newYear)
     setimagePage(1)
+    const imageURLNew: string = getImageURL(imageList, newYear, 1)
+    setImageURL(imageURLNew)
+    console.log(imageURLNew)
   }
 
   const onClickRight = () => {
     const newYear: number = year < 2024 ? year + 1 : 2014
     setYear(newYear)
     setimagePage(1)
+    const imageURLNew: string = getImageURL(imageList, newYear, 1)
+    setImageURL(imageURLNew)
+    console.log(imageURLNew)
   }
 
   return (
@@ -88,11 +115,11 @@ const App: React.FC = () => {
               <span id="left-arrow">{mSVG}</span>
             </Button>
             <div className="photo-canvas">
-              <img src={photo2023} className="photo"  alt="image"/>
+              <img src={imageURL} className="photo"  alt="image"/>
               <div className="photo-caption">VisLab {year.toString()}</div>
               <Stack spacing={2} sx={{display: "flex", alignItems: "center"}}>
                 <Typography>Page: {imagePage}</Typography>
-                <Pagination count={10} page={imagePage} onChange={handleChange} />
+                <Pagination count={10} page={imagePage} onChange={handleChangePagenation} />
               </Stack>
             </div>
             <Button variant="outlined" onClick={onClickRight}>
