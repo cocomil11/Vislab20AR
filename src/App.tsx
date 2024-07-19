@@ -142,7 +142,7 @@ const App: React.FC = () => {
               <span id="left-arrow">{mSVG}</span>
             </Button>
             <div className="photo-canvas">
-              <img src={imageURL} className="photo"  alt="image"/>
+              <img src={imageURL} className="photo"  alt="image" style={{ width: "100%", height: "auto" }}/>
               <div className="photo-caption">VisLab {year.toString()}</div>
               <Stack spacing={2} sx={{display: "flex", alignItems: "center"}}>
                 <Pagination count={imageCount} page={imagePage} onChange={handleChangePagenation} />
