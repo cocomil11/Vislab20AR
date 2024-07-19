@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./assets/css/App.css"; // import MindARViewer from "./mindar-viewer";
 import logo from './vislab_logo.png';
 import "./assets/css/ui.css"
 import photo2023 from './photos/VISLab2023.png';
 import LineChart from './LineChart.js';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
@@ -23,10 +22,43 @@ const Slider: React.FC<{ currentYear: number }> = ({ currentYear }) => {
   );
 }
 
+interface ImageList {
+  "2014": string[],
+  "2015": string[],
+  "2016": string[],
+  "2017": string[],
+  "2018": string[],
+  "2019": string[],
+  "2020": string[],
+  "2021": string[],
+  "2022": string[],
+  "2023": string[],
+  "2024": string[],
+}
+
 const App: React.FC = () => {
   const [started, setStarted] = useState<string | null>(null);
   const [year, setYear] = useState<number>(2014)
   const [imagePage, setimagePage] = useState<number>(1);
+  const [imageList, setImageList] = useState<ImageList | null>(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/data/images_by_year.json');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const imageListData: ImageList = await response.json();
+        setImageList(imageListData)
+        console.log(imageListData)
+      } catch (error) {
+        console.log("=== Error on fetching image list ===")
+      } 
+    };
+
+    fetchData();
+  }, []);
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setimagePage(value);
