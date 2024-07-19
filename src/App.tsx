@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./assets/css/App.css"; // import MindARViewer from "./mindar-viewer";
 import logo from './vislab_logo.png';
 import "./assets/css/ui.css"
-import photo2023 from './photos/VISLab2023.png';
 import LineChart from './LineChart.js';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 
@@ -44,6 +42,7 @@ const App: React.FC = () => {
   const [imagePage, setimagePage] = useState<number>(1);
   const [imageList, setImageList] = useState<ImageList | null>(null)
   const [imageURL, setImageURL] = useState<string>("")
+  const [imageCount, setImageCount] = useState<number>(0)
 
   const getImageURL = (imageList: ImageList | null, year: number, imagePage: number) => {
     if (imageList === null) {
@@ -54,6 +53,16 @@ const App: React.FC = () => {
       const imageURLEnd:string = imageList[imageListKey][imagePage-1]
       const imageURLNew:string = `${imageURLBase}/${imageURLEnd}`
       return imageURLNew
+    }
+  }
+
+  const getImageCount = (imageList: ImageList | null, year: number) => {
+    if (imageList === null) {
+      return 0
+    } else {
+        const imageListKey: keyof ImageList = year.toString() as keyof ImageList
+        const imageNumInYear: number = imageList[imageListKey].length
+        return imageNumInYear
     }
   }
 
@@ -70,6 +79,10 @@ const App: React.FC = () => {
         // set URL of the default image
         const imageURLNew: string = getImageURL(imageListData, year, imagePage)
         setImageURL(imageURLNew)
+
+        // set image count for pagenation
+        const imageCountNew: number = getImageCount(imageListData, year)
+        setImageCount(imageCountNew)
       } catch (error) {
         console.log("=== Error on fetching image list ===")
       } 
@@ -80,27 +93,41 @@ const App: React.FC = () => {
 
   const handleChangePagenation = (event: React.ChangeEvent<unknown>, page: number) => {
     setimagePage(page);
-    const imageURLNew: string = getImageURL(imageList, year, page-1)
+    const imageURLNew: string = getImageURL(imageList, year, page)
     setImageURL(imageURLNew)
     console.log(imageURLNew)
   };
 
   const onClickLeft = () => {
+    // update year
     const newYear: number = year > 2014 ? year - 1 : 2024
     setYear(newYear)
+    // reset image index
     setimagePage(1)
+
+    // update image
     const imageURLNew: string = getImageURL(imageList, newYear, 1)
     setImageURL(imageURLNew)
-    console.log(imageURLNew)
+
+    // set image count for pagenation
+    const imageCountNew: number = getImageCount(imageList, newYear)
+    setImageCount(imageCountNew)
   }
 
   const onClickRight = () => {
+    // update year
     const newYear: number = year < 2024 ? year + 1 : 2014
     setYear(newYear)
+    // reset image index
     setimagePage(1)
+
+    // update image
     const imageURLNew: string = getImageURL(imageList, newYear, 1)
     setImageURL(imageURLNew)
-    console.log(imageURLNew)
+
+    // set image count for pagenation
+    const imageCountNew: number = getImageCount(imageList, newYear)
+    setImageCount(imageCountNew)
   }
 
   return (
@@ -118,8 +145,7 @@ const App: React.FC = () => {
               <img src={imageURL} className="photo"  alt="image"/>
               <div className="photo-caption">VisLab {year.toString()}</div>
               <Stack spacing={2} sx={{display: "flex", alignItems: "center"}}>
-                <Typography>Page: {imagePage}</Typography>
-                <Pagination count={10} page={imagePage} onChange={handleChangePagenation} />
+                <Pagination count={imageCount} page={imagePage} onChange={handleChangePagenation} />
               </Stack>
             </div>
             <Button variant="outlined" onClick={onClickRight}>
