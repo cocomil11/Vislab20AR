@@ -4,6 +4,8 @@ import logo from './vislab_logo.png';
 import "./assets/css/ui.css"
 import photo2023 from './photos/VISLab2023.png';
 import LineChart from './LineChart.js';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
@@ -24,11 +26,23 @@ const Slider: React.FC<{ currentYear: number }> = ({ currentYear }) => {
 const App: React.FC = () => {
   const [started, setStarted] = useState<string | null>(null);
   const [year, setYear] = useState<number>(2014)
-  const [page, setPage] = useState<number>(1);
+  const [imagePage, setimagePage] = useState<number>(1);
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    setPage(value);
+    setimagePage(value);
   };
+
+  const onClickLeft = () => {
+    const newYear: number = year > 2014 ? year - 1 : 2024
+    setYear(newYear)
+    setimagePage(1)
+  }
+
+  const onClickRight = () => {
+    const newYear: number = year < 2024 ? year + 1 : 2014
+    setYear(newYear)
+    setimagePage(1)
+  }
 
   return (
     <div className="App">
@@ -38,16 +52,20 @@ const App: React.FC = () => {
       </div>
       <div className="canvas">
           <div className="photo-container">
-            <span id="left-arrow">{mSVG}</span>
+            <Button variant="outlined" onClick={onClickLeft}>
+              <span id="left-arrow">{mSVG}</span>
+            </Button>
             <div className="photo-canvas">
               <img src={photo2023} className="photo"  alt="image"/>
               <div className="photo-caption">VisLab {year.toString()}</div>
               <Stack spacing={2} sx={{display: "flex", alignItems: "center"}}>
-                <Typography>Page: {page}</Typography>
-                <Pagination count={10} page={page} onChange={handleChange} />
+                <Typography>Page: {imagePage}</Typography>
+                <Pagination count={10} page={imagePage} onChange={handleChange} />
               </Stack>
             </div>
-            <span id="right-arrow">{mSVG}</span>
+            <Button variant="outlined" onClick={onClickRight}>
+              <span id="right-arrow">{mSVG}</span>
+            </Button>
           </div>
 
           <div className="chart-container">
